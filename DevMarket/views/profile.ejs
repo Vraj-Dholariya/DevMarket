@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title><%= title %></title>
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+<body class="flex flex-col min-h-screen">
+  <%- include('partials/navbar') %>
+
+  <main class="flex-1 py-12">
+    <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+      <h1 class="text-4xl font-bold mb-8">My Profile</h1>
+
+      <%- include('partials/messages') %>
+
+      <form action="/profile" method="POST" class="card space-y-6">
+        <div>
+          <label for="name" class="block text-sm font-medium mb-2">Full Name *</label>
+          <input type="text" id="name" name="name" required class="input" value="<%= user.name %>">
+        </div>
+
+        <div>
+          <label for="email" class="block text-sm font-medium mb-2">Email *</label>
+          <input type="email" id="email" name="email" disabled class="input bg-gray-100 dark:bg-gray-700" value="<%= user.email %>">
+          <p class="text-sm text-gray-500 dark:text-gray-400 mt-1">Email cannot be changed</p>
+        </div>
+
+        <div>
+          <label for="bio" class="block text-sm font-medium mb-2">Bio</label>
+          <textarea id="bio" name="bio" rows="4" class="input" placeholder="Tell us about yourself..."><%= user.bio || '' %></textarea>
+        </div>
+
+        <div>
+          <label for="skills" class="block text-sm font-medium mb-2">Skills</label>
+          <input type="text" id="skills" name="skills" class="input" value="<%= user.skills.join(', ') %>" placeholder="JavaScript, React, Node.js, Python">
+          <p class="text-sm text-gray-500 dark:text-gray-400 mt-1">Separate skills with commas</p>
+        </div>
+
+        <div class="flex gap-4">
+          <button type="submit" class="btn btn-primary">Update Profile</button>
+          <a href="/portfolio/<%= user._id %>" class="btn btn-secondary">View My Portfolio</a>
+        </div>
+      </form>
+    </div>
+  </main>
+
+  <%- include('partials/footer') %>
+  <script src="/js/main.js"></script>
+</body>
+</html>

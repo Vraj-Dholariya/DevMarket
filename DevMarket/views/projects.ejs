@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title><%= title %></title>
+  <link rel="stylesheet" href="/css/style.css">
+  <script src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js" defer></script>
+</head>
+<body class="flex flex-col min-h-screen">
+  <%- include('partials/navbar') %>
+
+  <main class="flex-1 py-12">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <h1 class="text-4xl font-bold mb-8">Browse Projects</h1>
+
+      <%- include('partials/messages') %>
+
+      <!-- Search and Filters -->
+      <form action="/projects" method="GET" class="card mb-8">
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+          <div>
+            <input
+              type="text"
+              name="search"
+              placeholder="Search projects..."
+              value="<%= filters.search || '' %>"
+              class="input"
+            />
+          </div>
+          <div>
+            <select name="category" class="input">
+              <option value="all">All Categories</option>
+              <option value="Web Development" <%= filters.category === 'Web Development' ? 'selected' : '' %>>Web Development</option>
+              <option value="Mobile App" <%= filters.category === 'Mobile App' ? 'selected' : '' %>>Mobile App</option>
+              <option value="Machine Learning" <%= filters.category === 'Machine Learning' ? 'selected' : '' %>>Machine Learning</option>
+              <option value="Data Science" <%= filters.category === 'Data Science' ? 'selected' : '' %>>Data Science</option>
+              <option value="Game Development" <%= filters.category === 'Game Development' ? 'selected' : '' %>>Game Development</option>
+              <option value="IoT" <%= filters.category === 'IoT' ? 'selected' : '' %>>IoT</option>
+              <option value="Other" <%= filters.category === 'Other' ? 'selected' : '' %>>Other</option>
+            </select>
+          </div>
+          <div>
+            <select name="difficulty" class="input">
+              <option value="all">All Levels</option>
+              <option value="Beginner" <%= filters.difficulty === 'Beginner' ? 'selected' : '' %>>Beginner</option>
+              <option value="Intermediate" <%= filters.difficulty === 'Intermediate' ? 'selected' : '' %>>Intermediate</option>
+              <option value="Advanced" <%= filters.difficulty === 'Advanced' ? 'selected' : '' %>>Advanced</option>
+            </select>
+          </div>
+          <div>
+            <button type="submit" class="btn btn-primary w-full">Search</button>
+          </div>
+        </div>
+      </form>
+
+      <!-- Projects List -->
+      <% if (projects.length === 0) { %>
+        <div class="card text-center py-12">
+          <p class="text-gray-500 dark:text-gray-400 text-lg">No projects found. Try different filters.</p>
+          <% if (user) { %>
+            <a href="/projects/create/new" class="btn btn-primary mt-4">Create the First Project</a>
+          <% } %>
+        </div>
+      <% } else { %>
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          <% projects.forEach(project => { %>
+            <div class="card card-hover">
+              <div class="flex justify-between items-start mb-3">
+                <h3 class="text-xl font-semibold flex-1">
+                  <a href="/projects/<%= project._id %>" class="hover:text-primary-600"><%= project.title %></a>
+                </h3>
+                <% if (user && bookmarkedProjectIds.includes(project._id.toString())) { %>
+                  <button onclick="toggleBookmark('<%= project._id %>', this)" class="text-yellow-500">
+                    <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+                      <path d="M5 4a2 2 0 012-2h6a2 2 0 012 2v14l-5-2.5L5 18V4z"/>
+                    </svg>
+                  </button>
+                <% } else if (user) { %>
+                  <button onclick="toggleBookmark('<%= project._id %>', this)" class="text-gray-400 hover:text-yellow-500">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z"></path>
+                    </svg>
+                  </button>
+                <% } %>
+              </div>
+
+              <div class="flex gap-2 mb-3">
+                <span class="badge badge-primary"><%= project.category %></span>
+                <span class="badge badge-info"><%= project.difficulty %></span>
+              </div>
+
+              <p class="text-gray-600 dark:text-gray-400 mb-4 line-clamp-3"><%= project.description %></p>
+
+              <div class="flex flex-wrap gap-2 mb-4">
+                <% project.technologies.slice(0, 3).forEach(tech => { %>
+                  <span class="text-xs px-2 py-1 bg-gray-100 dark:bg-gray-700 rounded"><%= tech %></span>
+                <% }) %>
+                <% if (project.technologies.length > 3) { %>
+                  <span class="text-xs px-2 py-1 bg-gray-100 dark:bg-gray-700 rounded">+<%= project.technologies.length - 3 %> more</span>
+                <% } %>
+              </div>
+
+              <div class="border-t border-gray-200 dark:border-gray-700 pt-4 mt-4">
+                <div class="flex justify-between items-center text-sm">
+                  <span class="text-gray-600 dark:text-gray-400">by <%= project.owner ? project.owner.name : 'Unknown' %></span>
+                  <a href="/projects/<%= project._id %>" class="text-primary-600 hover:text-primary-700 font-medium">
+                    View Details →
+                  </a>
+                </div>
+              </div>
+            </div>
+          <% }) %>
+        </div>
+      <% } %>
+    </div>
+  </main>
+
+  <%- include('partials/footer') %>
+  <script src="/js/main.js"></script>
+</body>
+</html>

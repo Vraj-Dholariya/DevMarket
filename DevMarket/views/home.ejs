@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title><%= title %></title>
+  <link rel="stylesheet" href="/css/style.css">
+  <script src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js" defer></script>
+</head>
+<body class="flex flex-col min-h-screen">
+  <%- include('partials/navbar') %>
+
+  <main class="flex-1">
+    <!-- Hero Section -->
+    <section class="bg-gradient-to-br from-primary-50 to-primary-100 dark:from-gray-800 dark:to-gray-900 py-20">
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="text-center">
+          <h1 class="text-5xl font-bold text-gray-900 dark:text-white mb-6">
+            Welcome to <span class="text-primary-600">DevMarket</span>
+          </h1>
+          <p class="text-xl text-gray-600 dark:text-gray-300 mb-8 max-w-2xl mx-auto">
+            Connect with developers, discover exciting projects, and build amazing things together.
+          </p>
+          <div class="flex justify-center gap-4">
+            <% if (!user) { %>
+              <a href="/register" class="btn btn-primary text-lg px-8 py-3">Get Started</a>
+              <a href="/projects" class="btn btn-secondary text-lg px-8 py-3">Browse Projects</a>
+            <% } else { %>
+              <a href="/projects/create/new" class="btn btn-primary text-lg px-8 py-3">Create Project</a>
+              <a href="/projects" class="btn btn-secondary text-lg px-8 py-3">Browse Projects</a>
+            <% } %>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
+      <%- include('partials/messages') %>
+
+      <!-- Trending Projects -->
+      <% if (trendingProjects && trendingProjects.length > 0) { %>
+        <section class="mb-16">
+          <h2 class="text-3xl font-bold mb-8">🔥 Trending Projects</h2>
+          <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <% trendingProjects.forEach(project => { %>
+              <div class="card card-hover">
+                <div class="flex justify-between items-start mb-4">
+                  <h3 class="text-xl font-semibold">
+                    <a href="/projects/<%= project._id %>" class="hover:text-primary-600"><%= project.title %></a>
+                  </h3>
+                  <span class="badge badge-primary"><%= project.difficulty %></span>
+                </div>
+                <p class="text-gray-600 dark:text-gray-400 mb-4 line-clamp-3"><%= project.description %></p>
+                <div class="flex flex-wrap gap-2 mb-4">
+                  <% project.technologies.slice(0, 3).forEach(tech => { %>
+                    <span class="badge badge-info"><%= tech %></span>
+                  <% }) %>
+                </div>
+                <div class="flex justify-between items-center text-sm text-gray-500 dark:text-gray-400">
+                  <span>by <%= project.owner ? project.owner.name : 'Unknown' %></span>
+                  <span>👁 <%= project.viewCount %> | 🔖 <%= project.bookmarkCount %></span>
+                </div>
+              </div>
+            <% }) %>
+          </div>
+        </section>
+      <% } %>
+
+      <!-- Recent Projects -->
+      <% if (recentProjects && recentProjects.length > 0) { %>
+        <section>
+          <h2 class="text-3xl font-bold mb-8">✨ Recent Projects</h2>
+          <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <% recentProjects.forEach(project => { %>
+              <div class="card card-hover">
+                <div class="flex justify-between items-start mb-4">
+                  <h3 class="text-xl font-semibold">
+                    <a href="/projects/<%= project._id %>" class="hover:text-primary-600"><%= project.title %></a>
+                  </h3>
+                  <span class="badge badge-primary"><%= project.difficulty %></span>
+                </div>
+                <p class="text-gray-600 dark:text-gray-400 mb-4 line-clamp-3"><%= project.description %></p>
+                <div class="flex flex-wrap gap-2 mb-4">
+                  <% project.technologies.slice(0, 3).forEach(tech => { %>
+                    <span class="badge badge-info"><%= tech %></span>
+                  <% }) %>
+                </div>
+                <div class="flex justify-between items-center text-sm text-gray-500 dark:text-gray-400">
+                  <span>by <%= project.owner ? project.owner.name : 'Unknown' %></span>
+                  <span><%= new Date(project.createdAt).toLocaleDateString() %></span>
+                </div>
+              </div>
+            <% }) %>
+          </div>
+        </section>
+      <% } %>
+    </div>
+  </main>
+
+  <%- include('partials/footer') %>
+  <script src="/js/main.js"></script>
+</body>
+</html>

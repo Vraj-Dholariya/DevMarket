@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title><%= title %></title>
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+<body class="flex flex-col min-h-screen">
+  <%- include('partials/navbar') %>
+
+  <main class="flex-1 py-12">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <!-- Profile Header -->
+      <div class="card mb-8">
+        <div class="flex items-start gap-6">
+          <div class="w-24 h-24 bg-primary-600 text-white rounded-full flex items-center justify-center text-4xl font-bold">
+            <%= portfolioUser.name.charAt(0).toUpperCase() %>
+          </div>
+          <div class="flex-1">
+            <h1 class="text-4xl font-bold mb-2"><%= portfolioUser.name %></h1>
+            <p class="text-gray-600 dark:text-gray-400 mb-4"><%= portfolioUser.email %></p>
+            <% if (portfolioUser.bio) { %>
+              <p class="text-gray-700 dark:text-gray-300 mb-4"><%= portfolioUser.bio %></p>
+            <% } %>
+            <% if (portfolioUser.skills && portfolioUser.skills.length > 0) { %>
+              <div>
+                <h3 class="text-sm font-semibold mb-2">Skills</h3>
+                <div class="flex flex-wrap gap-2">
+                  <% portfolioUser.skills.forEach(skill => { %>
+                    <span class="badge badge-primary"><%= skill %></span>
+                  <% }) %>
+                </div>
+              </div>
+            <% } %>
+          </div>
+        </div>
+      </div>
+
+      <!-- Projects -->
+      <div class="mb-8">
+        <h2 class="text-3xl font-bold mb-6">Projects (<%= projects.length %>)</h2>
+        <% if (projects.length === 0) { %>
+          <div class="card text-center py-12">
+            <p class="text-gray-500 dark:text-gray-400">No projects yet.</p>
+          </div>
+        <% } else { %>
+          <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <% projects.forEach(project => { %>
+              <div class="card card-hover">
+                <div class="flex justify-between items-start mb-3">
+                  <h3 class="text-xl font-semibold flex-1">
+                    <a href="/projects/<%= project._id %>" class="hover:text-primary-600"><%= project.title %></a>
+                  </h3>
+                  <span class="badge badge-primary"><%= project.difficulty %></span>
+                </div>
+                <p class="text-gray-600 dark:text-gray-400 mb-4 line-clamp-3"><%= project.description %></p>
+                <div class="flex flex-wrap gap-2 mb-4">
+                  <% project.technologies.slice(0, 3).forEach(tech => { %>
+                    <span class="text-xs px-2 py-1 bg-gray-100 dark:bg-gray-700 rounded"><%= tech %></span>
+                  <% }) %>
+                </div>
+                <a href="/projects/<%= project._id %>" class="text-primary-600 hover:text-primary-700 font-medium">
+                  View Project →
+                </a>
+              </div>
+            <% }) %>
+          </div>
+        <% } %>
+      </div>
+
+      <!-- Collaborations -->
+      <% if (collaborations && collaborations.length > 0) { %>
+        <div>
+          <h2 class="text-3xl font-bold mb-6">Collaborations (<%= collaborations.length %>)</h2>
+          <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <% collaborations.forEach(project => { %>
+              <div class="card card-hover">
+                <div class="flex justify-between items-start mb-3">
+                  <h3 class="text-xl font-semibold flex-1">
+                    <a href="/projects/<%= project._id %>" class="hover:text-primary-600"><%= project.title %></a>
+                  </h3>
+                  <span class="badge badge-info">Team Member</span>
+                </div>
+                <p class="text-gray-600 dark:text-gray-400 mb-4 line-clamp-3"><%= project.description %></p>
+                <div class="flex justify-between items-center">
+                  <span class="text-sm text-gray-500 dark:text-gray-400">by <%= project.owner ? project.owner.name : 'Unknown' %></span>
+                  <a href="/projects/<%= project._id %>" class="text-primary-600 hover:text-primary-700 font-medium">
+                    View →
+                  </a>
+                </div>
+              </div>
+            <% }) %>
+          </div>
+        </div>
+      <% } %>
+    </div>
+  </main>
+
+  <%- include('partials/footer') %>
+  <script src="/js/main.js"></script>
+</body>
+</html>

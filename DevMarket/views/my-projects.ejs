@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title><%= title %></title>
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+<body class="flex flex-col min-h-screen">
+  <%- include('partials/navbar') %>
+
+  <main class="flex-1 py-12">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="flex justify-between items-center mb-8">
+        <h1 class="text-4xl font-bold">My Projects</h1>
+        <a href="/projects/create/new" class="btn btn-primary">Create New Project</a>
+      </div>
+
+      <%- include('partials/messages') %>
+
+      <% if (projects.length === 0) { %>
+        <div class="card text-center py-16">
+          <p class="text-gray-500 dark:text-gray-400 text-lg mb-4">You haven't created any projects yet.</p>
+          <a href="/projects/create/new" class="btn btn-primary">Create Your First Project</a>
+        </div>
+      <% } else { %>
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          <% projects.forEach(project => { %>
+            <div class="card card-hover">
+              <div class="flex justify-between items-start mb-3">
+                <h3 class="text-xl font-semibold flex-1">
+                  <a href="/projects/<%= project._id %>" class="hover:text-primary-600"><%= project.title %></a>
+                </h3>
+                <span class="badge badge-<%= project.status === 'Open' ? 'success' : project.status === 'In Progress' ? 'warning' : 'secondary' %>">
+                  <%= project.status %>
+                </span>
+              </div>
+
+              <p class="text-gray-600 dark:text-gray-400 mb-4 line-clamp-3"><%= project.description %></p>
+
+              <div class="flex flex-wrap gap-2 mb-4">
+                <% project.technologies.slice(0, 3).forEach(tech => { %>
+                  <span class="text-xs px-2 py-1 bg-gray-100 dark:bg-gray-700 rounded"><%= tech %></span>
+                <% }) %>
+              </div>
+
+              <div class="border-t border-gray-200 dark:border-gray-700 pt-4 mt-4">
+                <div class="flex justify-between text-sm text-gray-500 dark:text-gray-400 mb-3">
+                  <span>👥 <%= project.teamMembers.length %>/<%= project.maxTeamSize %></span>
+                  <span>👁 <%= project.viewCount %></span>
+                  <span>🔖 <%= project.bookmarkCount %></span>
+                </div>
+                <div class="flex gap-2">
+                  <a href="/projects/<%= project._id %>" class="btn btn-secondary flex-1 text-center">View</a>
+                  <a href="/projects/<%= project._id %>/edit" class="btn btn-primary flex-1 text-center">Edit</a>
+                </div>
+              </div>
+            </div>
+          <% }) %>
+        </div>
+      <% } %>
+    </div>
+  </main>
+
+  <%- include('partials/footer') %>
+  <script src="/js/main.js"></script>
+</body>
+</html>

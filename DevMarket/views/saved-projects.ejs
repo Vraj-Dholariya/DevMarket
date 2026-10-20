@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title><%= title %></title>
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+<body class="flex flex-col min-h-screen">
+  <%- include('partials/navbar') %>
+
+  <main class="flex-1 py-12">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <h1 class="text-4xl font-bold mb-8">Saved Projects</h1>
+
+      <%- include('partials/messages') %>
+
+      <% if (projects.length === 0) { %>
+        <div class="card text-center py-16">
+          <p class="text-gray-500 dark:text-gray-400 text-lg mb-4">You haven't saved any projects yet.</p>
+          <a href="/projects" class="btn btn-primary">Browse Projects</a>
+        </div>
+      <% } else { %>
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          <% projects.forEach(project => { %>
+            <div class="card card-hover">
+              <div class="flex justify-between items-start mb-3">
+                <h3 class="text-xl font-semibold flex-1">
+                  <a href="/projects/<%= project._id %>" class="hover:text-primary-600"><%= project.title %></a>
+                </h3>
+                <button onclick="toggleBookmark('<%= project._id %>', this)" class="text-yellow-500">
+                  <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+                    <path d="M5 4a2 2 0 012-2h6a2 2 0 012 2v14l-5-2.5L5 18V4z"/>
+                  </svg>
+                </button>
+              </div>
+
+              <div class="flex gap-2 mb-3">
+                <span class="badge badge-primary"><%= project.category %></span>
+                <span class="badge badge-info"><%= project.difficulty %></span>
+              </div>
+
+              <p class="text-gray-600 dark:text-gray-400 mb-4 line-clamp-3"><%= project.description %></p>
+
+              <div class="flex flex-wrap gap-2 mb-4">
+                <% project.technologies.slice(0, 3).forEach(tech => { %>
+                  <span class="text-xs px-2 py-1 bg-gray-100 dark:bg-gray-700 rounded"><%= tech %></span>
+                <% }) %>
+              </div>
+
+              <div class="border-t border-gray-200 dark:border-gray-700 pt-4 mt-4">
+                <div class="flex justify-between items-center">
+                  <span class="text-sm text-gray-600 dark:text-gray-400">by <%= project.owner ? project.owner.name : 'Unknown' %></span>
+                  <a href="/projects/<%= project._id %>" class="text-primary-600 hover:text-primary-700 font-medium">
+                    View Details →
+                  </a>
+                </div>
+              </div>
+            </div>
+          <% }) %>
+        </div>
+      <% } %>
+    </div>
+  </main>
+
+  <%- include('partials/footer') %>
+  <script src="/js/main.js"></script>
+</body>
+</html>

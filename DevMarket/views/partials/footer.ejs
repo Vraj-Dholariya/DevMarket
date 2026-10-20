@@ -1,0 +1,42 @@
+<footer class="bg-white dark:bg-gray-800 border-t border-gray-200 dark:border-gray-700 mt-auto">
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+      <div>
+        <div class="flex items-center space-x-2 mb-4">
+          <svg class="w-8 h-8 text-primary-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4"></path>
+          </svg>
+          <span class="text-xl font-bold text-primary-600">DevMarket</span>
+        </div>
+        <p class="text-gray-600 dark:text-gray-400 text-sm">
+          Connect with developers, discover exciting projects, and build amazing things together.
+        </p>
+      </div>
+
+      <div>
+        <h3 class="font-semibold mb-4">Quick Links</h3>
+        <ul class="space-y-2 text-sm">
+          <li><a href="/projects" class="text-gray-600 dark:text-gray-400 hover:text-primary-600 dark:hover:text-primary-400">Browse Projects</a></li>
+          <% if (user) { %>
+            <li><a href="/dashboard" class="text-gray-600 dark:text-gray-400 hover:text-primary-600 dark:hover:text-primary-400">Dashboard</a></li>
+            <li><a href="/projects/create/new" class="text-gray-600 dark:text-gray-400 hover:text-primary-600 dark:hover:text-primary-400">Create Project</a></li>
+          <% } else { %>
+            <li><a href="/login" class="text-gray-600 dark:text-gray-400 hover:text-primary-600 dark:hover:text-primary-400">Login</a></li>
+            <li><a href="/register" class="text-gray-600 dark:text-gray-400 hover:text-primary-600 dark:hover:text-primary-400">Sign Up</a></li>
+          <% } %>
+        </ul>
+      </div>
+
+      <div>
+        <h3 class="font-semibold mb-4">About</h3>
+        <p class="text-gray-600 dark:text-gray-400 text-sm">
+          DevMarket is a platform for developers to collaborate, share ideas, and build projects together.
+        </p>
+      </div>
+    </div>
+
+    <div class="border-t border-gray-200 dark:border-gray-700 mt-8 pt-8 text-center text-sm text-gray-600 dark:text-gray-400">
+      <p>&copy; <%= new Date().getFullYear() %> DevMarket. All rights reserved.</p>
+    </div>
+  </div>
+</footer>

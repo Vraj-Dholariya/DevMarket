@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title><%= title %></title>
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+<body class="flex flex-col min-h-screen">
+  <%- include('partials/navbar') %>
+
+  <main class="flex-1 flex items-center justify-center py-12">
+    <div class="text-center px-4">
+      <h1 class="text-9xl font-bold text-red-600 mb-4">500</h1>
+      <h2 class="text-4xl font-bold mb-4">Server Error</h2>
+      <p class="text-gray-600 dark:text-gray-400 mb-8 text-lg">
+        Something went wrong on our end. Please try again later.
+      </p>
+      <div class="flex gap-4 justify-center">
+        <a href="/" class="btn btn-primary">Go Home</a>
+        <a href="/dashboard" class="btn btn-secondary">Dashboard</a>
+      </div>
+    </div>
+  </main>
+
+  <%- include('partials/footer') %>
+  <script src="/js/main.js"></script>
+</body>
+</html>

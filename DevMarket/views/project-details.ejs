@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title><%= title %></title>
+  <link rel="stylesheet" href="/css/style.css">
+  <script src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js" defer></script>
+  <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+</head>
+<body class="flex flex-col min-h-screen">
+  <%- include('partials/navbar') %>
+
+  <main class="flex-1 py-12">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <%- include('partials/messages') %>
+
+      <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+        <!-- Main Content -->
+        <div class="lg:col-span-2 space-y-6">
+          <!-- Project Header -->
+          <div class="card">
+            <div class="flex justify-between items-start mb-4">
+              <h1 class="text-4xl font-bold"><%= project.title %></h1>
+              <% if (user && user.id === project.owner._id.toString()) { %>
+                <div class="flex gap-2">
+                  <a href="/projects/<%= project._id %>/edit" class="btn btn-secondary">Edit</a>
+                  <form action="/projects/<%= project._id %>/delete" method="POST" onsubmit="return confirmDelete('Are you sure you want to delete this project?')">
+                    <button type="submit" class="btn btn-danger">Delete</button>
+                  </form>
+                </div>
+              <% } %>
+            </div>
+
+            <div class="flex flex-wrap gap-2 mb-4">
+              <span class="badge badge-primary"><%= project.category %></span>
+              <span class="badge badge-info"><%= project.difficulty %></span>
+              <span class="badge badge-<%= project.status === 'Open' ? 'success' : project.status === 'In Progress' ? 'warning' : 'secondary' %>">
+                <%= project.status %>
+              </span>
+            </div>
+
+            <p class="text-gray-600 dark:text-gray-400 mb-4"><%= project.description %></p>
+
+            <div class="flex gap-6 text-sm text-gray-500 dark:text-gray-400">
+              <span>👁 <%= project.viewCount %> views</span>
+              <span>🔖 <%= project.bookmarkCount %> bookmarks</span>
+              <span>👥 <%= project.teamMembers.length %>/<%= project.maxTeamSize %> team members</span>
+            </div>
+          </div>
+
+          <!-- Technologies -->
+          <div class="card">
+            <h2 class="text-2xl font-semibold mb-4">Technologies</h2>
+            <div class="flex flex-wrap gap-2">
+              <% project.technologies.forEach(tech => { %>
+                <span class="badge badge-info"><%= tech %></span>
+              <% }) %>
+            </div>
+          </div>
+
+          <!-- Required Skills -->
+          <div class="card">
+            <h2 class="text-2xl font-semibold mb-4">Required Skills</h2>
+            <div class="flex flex-wrap gap-2">
+              <% project.requiredSkills.forEach(skill => { %>
+                <span class="badge badge-warning"><%= skill %></span>
+              <% }) %>
+            </div>
+          </div>
+
+          <!-- Team Members -->
+          <div class="card">
+            <h2 class="text-2xl font-semibold mb-4">Team</h2>
+            <div class="space-y-3">
+              <div class="flex items-center gap-3">
+                <div class="w-10 h-10 bg-primary-600 text-white rounded-full flex items-center justify-center font-semibold">
+                  <%= project.owner && project.owner.name ? project.owner.name.charAt(0).toUpperCase() : '?' %>
+                </div>
+                <div>
+                  <p class="font-medium">
+                    <a href="/portfolio/<%= project.owner._id %>" class="hover:text-primary-600"><%= project.owner ? project.owner.name : 'Unknown' %></a>
+                  </p>
+                  <p class="text-sm text-gray-500 dark:text-gray-400">Project Owner</p>
+                </div>
+              </div>
+
+              <% project.teamMembers.forEach(member => { %>
+                <div class="flex items-center gap-3">
+                  <div class="w-10 h-10 bg-gray-600 text-white rounded-full flex items-center justify-center font-semibold">
+                    <%= member.name ? member.name.charAt(0).toUpperCase() : '?' %>
+                  </div>
+                  <div>
+                    <p class="font-medium">
+                      <a href="/portfolio/<%= member._id %>" class="hover:text-primary-600"><%= member.name || 'Unknown' %></a>
+                    </p>
+                    <p class="text-sm text-gray-500 dark:text-gray-400">Team Member</p>
+                  </div>
+                </div>
+              <% }) %>
+            </div>
+          </div>
+
+          <!-- Milestones Preview -->
+          <% if (project.milestones && project.milestones.length > 0) { %>
+            <div class="card">
+              <h2 class="text-2xl font-semibold mb-4">Project Milestones</h2>
+              <p class="text-gray-600 dark:text-gray-400 mb-4">
+                <%= project.milestones.filter(m => m.completed).length %>/<%= project.milestones.length %> milestones completed
+              </p>
+              <% if (user && (user.id === project.owner._id.toString() || project.teamMembers.some(m => m._id.toString() === user.id))) { %>
+                <a href="/projects/<%= project._id %>/progress" class="btn btn-primary">View Progress</a>
+              <% } %>
+            </div>
+          <% } %>
+        </div>
+
+        <!-- Sidebar -->
+        <div class="space-y-6">
+          <!-- Actions -->
+          <% if (user) { %>
+            <div class="card">
+              <h3 class="text-lg font-semibold mb-4">Actions</h3>
+              <div class="space-y-3">
+                <% if (user.id !== project.owner._id.toString() && !project.teamMembers.some(m => m._id.toString() === user.id)) { %>
+                  <% if (!hasRequested && project.teamMembers.length < project.maxTeamSize) { %>
+                    <button onclick="document.getElementById('joinModal').classList.remove('hidden')" class="btn btn-success w-full">
+                      Request to Join
+                    </button>
+                  <% } else if (hasRequested) { %>
+                    <button class="btn btn-secondary w-full" disabled>Request Sent</button>
+                  <% } else { %>
+                    <button class="btn btn-secondary w-full" disabled>Team Full</button>
+                  <% } %>
+                <% } %>
+
+                <button onclick="toggleBookmark('<%= project._id %>', this)" class="btn btn-secondary w-full">
+                  <%= isBookmarked ? '🔖 Bookmarked' : 'Bookmark Project' %>
+                </button>
+              </div>
+            </div>
+          <% } else { %>
+            <div class="card">
+              <p class="text-gray-600 dark:text-gray-400 mb-4">
+                Please log in to join this project or bookmark it.
+              </p>
+              <a href="/login" class="btn btn-primary w-full">Login</a>
+            </div>
+          <% } %>
+
+          <!-- Readiness Score -->
+          <div class="card">
+            <h3 class="text-lg font-semibold mb-3">Project Readiness</h3>
+            <div class="flex items-center justify-between mb-2">
+              <span class="text-3xl font-bold text-primary-600"><%= readinessScore %>%</span>
+              <span class="text-sm text-gray-500 dark:text-gray-400">Ready Score</span>
+            </div>
+            <div class="progress-bar mb-3">
+              <div class="progress-fill bg-primary-600" style="width: <%= readinessScore %>%"></div>
+            </div>
+            <p class="text-sm text-gray-600 dark:text-gray-400">
+              <% if (readinessScore >= 80) { %>
+                This project is well-defined and ready for development!
+              <% } else if (readinessScore >= 50) { %>
+                This project has good structure but could use more details.
+              <% } else { %>
+                This project needs more planning and details.
+              <% } %>
+            </p>
+          </div>
+
+          <!-- Skill Match (Vue Component) -->
+          <% if (user && skillMatch) { %>
+            <div class="card" id="skillMatchApp">
+              <skill-match
+                :user-skills='<%= JSON.stringify(skillMatch.percentage >= 0 ? (project.owner._id.toString() === user.id ? project.owner.skills : project.teamMembers.find(m => m._id.toString() === user.id)?.skills || []) : []) %>'
+                :required-skills='<%= JSON.stringify(project.requiredSkills) %>'
+              ></skill-match>
+            </div>
+          <% } %>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <!-- Join Request Modal -->
+  <% if (user && user.id !== project.owner._id.toString() && !hasRequested) { %>
+    <div id="joinModal" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50" onclick="if(event.target === this) this.classList.add('hidden')">
+      <div class="bg-white dark:bg-gray-800 rounded-xl p-6 max-w-md w-full mx-4">
+        <h3 class="text-2xl font-bold mb-4">Join Project</h3>
+        <form action="/projects/<%= project._id %>/join" method="POST">
+          <div class="mb-4">
+            <label for="message" class="block text-sm font-medium mb-2">Message to Project Owner (Optional)</label>
+            <textarea
+              id="message"
+              name="message"
+              rows="4"
+              class="input"
+              placeholder="Tell the owner why you'd like to join..."
+            ></textarea>
+          </div>
+          <div class="flex gap-3">
+            <button type="button" onclick="document.getElementById('joinModal').classList.add('hidden')" class="btn btn-secondary flex-1">
+              Cancel
+            </button>
+            <button type="submit" class="btn btn-success flex-1">
+              Send Request
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  <% } %>
+
+  <%- include('partials/footer') %>
+  
+  <script src="/js/main.js"></script>
+  <script src="/vue/skill-match.js"></script>
+  <% if (user && skillMatch) { %>
+    <script>
+      const { createApp } = Vue;
+      createApp({
+        components: {
+          'skill-match': SkillMatch
+        }
+      }).mount('#skillMatchApp');
+    </script>
+  <% } %>
+</body>
+</html>

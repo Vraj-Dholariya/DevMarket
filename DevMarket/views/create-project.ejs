@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title><%= title %></title>
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+<body class="flex flex-col min-h-screen">
+  <%- include('partials/navbar') %>
+
+  <main class="flex-1 py-12">
+    <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+      <h1 class="text-4xl font-bold mb-8">Create New Project</h1>
+
+      <%- include('partials/messages') %>
+
+      <form action="/projects" method="POST" class="card space-y-6">
+        <div>
+          <label for="title" class="block text-sm font-medium mb-2">Project Title *</label>
+          <input type="text" id="title" name="title" required class="input" placeholder="My Awesome Project">
+        </div>
+
+        <div>
+          <label for="description" class="block text-sm font-medium mb-2">Description *</label>
+          <textarea id="description" name="description" required rows="5" class="input" placeholder="Describe your project..."></textarea>
+          <p class="text-sm text-gray-500 dark:text-gray-400 mt-1">Provide a clear description of what you want to build</p>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div>
+            <label for="category" class="block text-sm font-medium mb-2">Category *</label>
+            <select id="category" name="category" required class="input">
+              <option value="">Select Category</option>
+              <option value="Web Development">Web Development</option>
+              <option value="Mobile App">Mobile App</option>
+              <option value="Machine Learning">Machine Learning</option>
+              <option value="Data Science">Data Science</option>
+              <option value="Game Development">Game Development</option>
+              <option value="IoT">IoT</option>
+              <option value="Other">Other</option>
+            </select>
+          </div>
+
+          <div>
+            <label for="difficulty" class="block text-sm font-medium mb-2">Difficulty Level *</label>
+            <select id="difficulty" name="difficulty" required class="input">
+              <option value="">Select Difficulty</option>
+              <option value="Beginner">Beginner</option>
+              <option value="Intermediate">Intermediate</option>
+              <option value="Advanced">Advanced</option>
+            </select>
+          </div>
+        </div>
+
+        <div>
+          <label for="technologies" class="block text-sm font-medium mb-2">Technologies</label>
+          <input type="text" id="technologies" name="technologies" class="input" placeholder="React, Node.js, MongoDB">
+          <p class="text-sm text-gray-500 dark:text-gray-400 mt-1">Separate technologies with commas</p>
+        </div>
+
+        <div>
+          <label for="requiredSkills" class="block text-sm font-medium mb-2">Required Skills</label>
+          <input type="text" id="requiredSkills" name="requiredSkills" class="input" placeholder="JavaScript, HTML, CSS, API Development">
+          <p class="text-sm text-gray-500 dark:text-gray-400 mt-1">Separate skills with commas</p>
+        </div>
+
+        <div>
+          <label for="maxTeamSize" class="block text-sm font-medium mb-2">Maximum Team Size</label>
+          <input type="number" id="maxTeamSize" name="maxTeamSize" min="1" max="20" value="5" class="input">
+          <p class="text-sm text-gray-500 dark:text-gray-400 mt-1">How many people can join this project?</p>
+        </div>
+
+        <!-- Milestones Section -->
+        <div>
+          <label class="block text-sm font-medium mb-2">Project Milestones (Optional)</label>
+          <div id="milestonesContainer" class="space-y-2 mb-3">
+            <!-- Milestones will be added here dynamically -->
+          </div>
+          <button type="button" onclick="addMilestone()" class="btn btn-secondary btn-sm">
+            + Add Milestone
+          </button>
+          <p class="text-sm text-gray-500 dark:text-gray-400 mt-1">Define key milestones for your project</p>
+        </div>
+
+        <div class="flex gap-4">
+          <button type="submit" class="btn btn-primary">Create Project</button>
+          <a href="/my-projects" class="btn btn-secondary">Cancel</a>
+        </div>
+      </form>
+    </div>
+  </main>
+
+  <%- include('partials/footer') %>
+  <script src="/js/main.js"></script>
+  <script>
+    let milestoneCount = 0;
+
+    function addMilestone() {
+      const container = document.getElementById('milestonesContainer');
+      const milestoneDiv = document.createElement('div');
+      milestoneDiv.className = 'flex gap-2 items-center';
+      milestoneDiv.innerHTML = `
+        <input 
+          type="text" 
+          name="milestones[]" 
+          class="input flex-1" 
+          placeholder="Milestone ${milestoneCount + 1}: e.g., Setup development environment"
+          required
+        >
+        <button 
+          type="button" 
+          onclick="this.parentElement.remove()" 
+          class="btn btn-danger btn-sm"
+        >
+          Remove
+        </button>
+      `;
+      container.appendChild(milestoneDiv);
+      milestoneCount++;
+    }
+
+    // Add one milestone by default
+    window.addEventListener('DOMContentLoaded', () => {
+      addMilestone();
+    });
+  </script>
+</body>
+</html>

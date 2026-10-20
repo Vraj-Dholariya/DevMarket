@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title><%= title %></title>
+  <link rel="stylesheet" href="/css/style.css">
+  <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+</head>
+<body class="flex flex-col min-h-screen">
+  <%- include('partials/navbar') %>
+
+  <main class="flex-1 py-12">
+    <div class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="flex justify-between items-center mb-8">
+        <h1 class="text-4xl font-bold"><%= project.title %> - Progress</h1>
+        <a href="/projects/<%= project._id %>" class="btn btn-secondary">Back to Project</a>
+      </div>
+
+      <%- include('partials/messages') %>
+
+      <div class="card mb-8">
+        <h2 class="text-2xl font-semibold mb-4">Team Members</h2>
+        <div class="flex flex-wrap gap-4">
+          <div class="flex items-center gap-2 px-4 py-2 bg-primary-100 dark:bg-primary-900 rounded-lg">
+            <div class="w-8 h-8 bg-primary-600 text-white rounded-full flex items-center justify-center font-semibold text-sm">
+              <%= project.owner && project.owner.name ? project.owner.name.charAt(0).toUpperCase() : '?' %>
+            </div>
+            <span class="font-medium"><%= project.owner ? project.owner.name : 'Unknown' %></span>
+            <span class="text-xs text-primary-600 dark:text-primary-400">(Owner)</span>
+          </div>
+          <% project.teamMembers.forEach(member => { %>
+            <div class="flex items-center gap-2 px-4 py-2 bg-gray-100 dark:bg-gray-700 rounded-lg">
+              <div class="w-8 h-8 bg-gray-600 text-white rounded-full flex items-center justify-center font-semibold text-sm">
+                <%= member.name ? member.name.charAt(0).toUpperCase() : '?' %>
+              </div>
+              <span class="font-medium"><%= member.name || 'Unknown' %></span>
+            </div>
+          <% }) %>
+        </div>
+      </div>
+
+      <div class="card" id="progressApp">
+        <progress-tracker
+          project-id="<%= project._id %>"
+          :initial-milestones="projectMilestones"
+          :is-owner="isProjectOwner"
+        ></progress-tracker>
+      </div>
+      
+      <% if (!project.milestones || project.milestones.length === 0) { %>
+        <div class="card mt-4 bg-blue-50 dark:bg-blue-900/20 border-blue-200 dark:border-blue-800">
+          <div class="flex gap-3">
+            <span class="text-2xl">💡</span>
+            <div>
+              <h3 class="font-semibold mb-2">No Milestones Yet</h3>
+              <p class="text-sm text-gray-600 dark:text-gray-400 mb-3">
+                This project doesn't have any milestones. Add milestones to track your progress!
+              </p>
+              <% if (isOwner) { %>
+                <p class="text-sm text-gray-600 dark:text-gray-400">
+                  You can add milestones using the form above, or go to 
+                  <a href="/projects/<%= project._id %>/edit" class="text-primary-600 hover:underline font-medium">
+                    Edit Project
+                  </a> to add multiple milestones at once.
+                </p>
+              <% } %>
+            </div>
+          </div>
+        </div>
+      <% } %>
+    </div>
+  </main>
+
+  <%- include('partials/footer') %>
+  <script src="/js/main.js"></script>
+  <script src="/vue/progress-tracker.js"></script>
+  <script>
+    const { createApp } = Vue;
+    
+    // Debug: Log the project data
+    console.log('Project ID:', '<%= project._id %>');
+    console.log('Milestones:', <%- JSON.stringify(project.milestones || []) %>);
+    console.log('Is Owner:', <%= isOwner %>);
+    
+    const app = createApp({
+      components: {
+        'progress-tracker': ProgressTracker
+      },
+      data() {
+        return {
+          projectMilestones: <%- JSON.stringify(project.milestones || []) %>,
+          isProjectOwner: <%= isOwner %>
+        }
+      }
+    });
+    
+    app.mount('#progressApp');
+    console.log('Vue app mounted successfully');
+  </script>
+</body>
+</html>

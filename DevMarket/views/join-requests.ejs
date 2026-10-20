@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title><%= title %></title>
+  <link rel="stylesheet" href="/css/style.css">
+  <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+</head>
+<body class="flex flex-col min-h-screen">
+  <%- include('partials/navbar') %>
+
+  <main class="flex-1 py-12">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <h1 class="text-4xl font-bold mb-8">Join Requests for My Projects</h1>
+
+      <%- include('partials/messages') %>
+
+      <% if (requests.length === 0) { %>
+        <div class="card text-center py-16">
+          <p class="text-gray-500 dark:text-gray-400 text-lg">No pending join requests.</p>
+        </div>
+      <% } else { %>
+        <div class="space-y-6">
+          <% requests.forEach(request => { %>
+            <div class="card">
+              <div class="flex justify-between items-start mb-4">
+                <div class="flex-1">
+                  <h3 class="text-2xl font-semibold mb-2">
+                    <%= request.user.name %> wants to join
+                    <a href="/projects/<%= request.project._id %>" class="text-primary-600 hover:text-primary-700">
+                      "<%= request.project.title %>"
+                    </a>
+                  </h3>
+                  <p class="text-gray-600 dark:text-gray-400">
+                    <%= request.user.email %> · <%= new Date(request.createdAt).toLocaleString() %>
+                  </p>
+                </div>
+                <span class="badge badge-<%= request.status === 'Pending' ? 'warning' : request.status === 'Accepted' ? 'success' : 'danger' %>">
+                  <%= request.status %>
+                </span>
+              </div>
+
+              <% if (request.message) { %>
+                <div class="bg-gray-50 dark:bg-gray-700 p-4 rounded-lg mb-4">
+                  <p class="text-sm font-medium mb-1">Message:</p>
+                  <p class="text-gray-700 dark:text-gray-300"><%= request.message %></p>
+                </div>
+              <% } %>
+
+              <!-- User Skills -->
+              <% if (request.user.skills && request.user.skills.length > 0) { %>
+                <div class="mb-4" id="skillMatch-<%= request._id %>">
+                  <skill-match
+                    :user-skills='<%= JSON.stringify(request.user.skills) %>'
+                    :required-skills='<%= JSON.stringify(request.project.requiredSkills) %>'
+                  ></skill-match>
+                </div>
+              <% } %>
+
+              <% if (request.status === 'Pending') { %>
+                <div class="flex gap-3">
+                  <form action="/requests/<%= request._id %>/accept" method="POST" class="flex-1">
+                    <button type="submit" class="btn btn-success w-full">Accept</button>
+                  </form>
+                  <form action="/requests/<%= request._id %>/reject" method="POST" class="flex-1">
+                    <button type="submit" class="btn btn-danger w-full">Reject</button>
+                  </form>
+                  <a href="/portfolio/<%= request.user._id %>" class="btn btn-secondary">View Profile</a>
+                </div>
+              <% } %>
+            </div>
+          <% }) %>
+        </div>
+      <% } %>
+    </div>
+  </main>
+
+  <%- include('partials/footer') %>
+  <script src="/js/main.js"></script>
+  <script src="/vue/skill-match.js"></script>
+  <script>
+    const { createApp } = Vue;
+    <% requests.forEach(request => { %>
+      <% if (request.user.skills && request.user.skills.length > 0) { %>
+        createApp({
+          components: {
+            'skill-match': SkillMatch
+          }
+        }).mount('#skillMatch-<%= request._id %>');
+      <% } %>
+    <% }) %>
+  </script>
+</body>
+</html>

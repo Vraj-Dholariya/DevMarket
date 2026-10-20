@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title><%= title %></title>
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+<body class="flex flex-col min-h-screen">
+  <%- include('partials/navbar') %>
+
+  <main class="flex-1 py-12">
+    <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="flex justify-between items-center mb-8">
+        <h1 class="text-4xl font-bold">Notifications</h1>
+        <% if (notifications.some(n => !n.read)) { %>
+          <form action="/notifications/read-all" method="POST">
+            <button type="submit" class="btn btn-secondary">Mark All as Read</button>
+          </form>
+        <% } %>
+      </div>
+
+      <%- include('partials/messages') %>
+
+      <% if (notifications.length === 0) { %>
+        <div class="card text-center py-16">
+          <p class="text-gray-500 dark:text-gray-400 text-lg">No notifications yet.</p>
+        </div>
+      <% } else { %>
+        <div class="space-y-4">
+          <% notifications.forEach(notification => { %>
+            <div class="card <%= notification.read ? 'opacity-60' : '' %>">
+              <div class="flex items-start gap-4">
+                <div class="flex-1">
+                  <div class="flex items-center gap-2 mb-2">
+                    <% if (!notification.read) { %>
+                      <span class="w-2 h-2 bg-primary-600 rounded-full"></span>
+                    <% } %>
+                    <p class="font-medium"><%= notification.message %></p>
+                  </div>
+                  <p class="text-sm text-gray-500 dark:text-gray-400">
+                    <%= new Date(notification.createdAt).toLocaleString() %>
+                  </p>
+                </div>
+                <div class="flex gap-2">
+                  <% if (notification.link) { %>
+                    <a href="<%= notification.link %>" 
+                       onclick="markNotificationRead('<%= notification._id %>')" 
+                       class="btn btn-primary">
+                      View
+                    </a>
+                  <% } %>
+                  <% if (!notification.read) { %>
+                    <button 
+                      onclick="markNotificationRead('<%= notification._id %>')" 
+                      class="btn btn-secondary">
+                      Mark Read
+                    </button>
+                  <% } %>
+                </div>
+              </div>
+            </div>
+          <% }) %>
+        </div>
+      <% } %>
+    </div>
+  </main>
+
+  <%- include('partials/footer') %>
+  <script src="/js/main.js"></script>
+</body>
+</html>
